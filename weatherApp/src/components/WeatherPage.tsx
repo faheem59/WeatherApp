@@ -13,34 +13,27 @@ import "../App.css"
 
 const WeatherPage = () => {
     const [selectedCity, setSelectedCity] = useState<CityData | null>(null);
+    const [displayCity, setDisplayCity] = useState<CityData | null>(null);
     const { maxTemperature, minTemperature, weatherTime, fetchWeatherData } = WeatherData();
 
     useEffect(() => {
         const lastSelectedCity = localStorage.getItem('lastSelectedCity');
-        const storedMaxTemperature = localStorage.getItem('maxTemperature');
-        const storedMinTemperature = localStorage.getItem('minTemperature');
-
         if (lastSelectedCity) {
-            const city = JSON.parse(lastSelectedCity);
+            const city: CityData = JSON.parse(lastSelectedCity);
             setSelectedCity(city);
-            if (storedMaxTemperature) {
-                fetchWeatherData(city);
-            }
-            if (storedMinTemperature) {
-                fetchWeatherData(city);
-            }
+            setDisplayCity(city);
         }
-    }, [fetchWeatherData]);
+    }, []);
 
     useEffect(() => {
         const interval = setInterval(() => {
-            if (selectedCity) {
-                fetchWeatherData(selectedCity);
+            if (displayCity) {
+                fetchWeatherData(displayCity);
             }
-        }, 1 * 60 * 1000);
+        }, 10 * 60 * 1000);
 
         return () => clearInterval(interval);
-    }, [fetchWeatherData, selectedCity]);
+    }, [fetchWeatherData, displayCity]);
 
     const averageTemperature = useMemo(() => {
         if (maxTemperature !== null && minTemperature !== null) {
@@ -54,12 +47,22 @@ const WeatherPage = () => {
         const city = data[cityIndex];
         setSelectedCity(city);
         localStorage.setItem('selectedCityIndex', JSON.stringify(cityIndex));
+        localStorage.setItem('lastSelectedCity', JSON.stringify(city));
+    };
+
+    const handleGetWeather = () => {
+        if (selectedCity) {
+            setDisplayCity(selectedCity);
+            fetchWeatherData(selectedCity);
+        }
     };
 
     useEffect(() => {
         const selectedCityIndex = localStorage.getItem('selectedCityIndex');
         if (selectedCityIndex !== null) {
-            setSelectedCity(data[Number(selectedCityIndex)]);
+            const cityIndex = Number(selectedCityIndex);
+            const city = data[cityIndex];
+            setSelectedCity(city);
         }
     }, []);
 
@@ -79,13 +82,13 @@ const WeatherPage = () => {
                     </Select>
                 </FormControl>
                 <Button variant="contained"
-                    onClick={() => fetchWeatherData(selectedCity)}
-                    sx={{ marginTop: "4px" }}>
+                    onClick={handleGetWeather}
+                    sx={{ marginTop: "2px" }}>
                     Get Weather
                 </Button>
-                {maxTemperature !== null && minTemperature !== null && (
+                {displayCity && maxTemperature !== null && minTemperature !== null && (
                     <div className="weather-info">
-                        <Typography variant="h5">Weather Forecast for {selectedCity?.city}</Typography>
+                        <Typography variant="h5">Weather Forecast for {displayCity.city}</Typography>
                         <CloudIcon className="cloud-icon" />
                         <Typography>Weather Time: {weatherTime}</Typography>
                         <Typography>Max Temperature: {maxTemperature} °C</Typography>
