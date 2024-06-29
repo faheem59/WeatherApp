@@ -13,6 +13,7 @@ const WeatherData = () => {
                 const apiUrl = `https://api.open-meteo.com/v1/forecast?latitude=${selectCity.lat}&longitude=${selectCity.lng}&daily=temperature_2m_max,temperature_2m_min&forecast_days=1`;
                 const response = await axios.get(apiUrl);
                 const weatherData = response.data;
+                console.log(weatherData);
 
                 setMaxTemperature(weatherData.daily.temperature_2m_max[0]);
                 setMinTemperature(weatherData.daily.temperature_2m_min[0]);

@@ -22,18 +22,21 @@ const WeatherPage = () => {
             const city: CityData = JSON.parse(lastSelectedCity);
             setSelectedCity(city);
             setDisplayCity(city);
+            fetchWeatherData(city);
         }
     }, []);
 
     useEffect(() => {
         const interval = setInterval(() => {
             if (displayCity) {
+                console.log('1114', displayCity);
                 fetchWeatherData(displayCity);
+
             }
-        }, 10 * 60 * 1000);
+        }, 10 * 1000);
 
         return () => clearInterval(interval);
-    }, [fetchWeatherData, displayCity]);
+    }, []);
 
     const averageTemperature = useMemo(() => {
         if (maxTemperature !== null && minTemperature !== null) {
@@ -63,6 +66,7 @@ const WeatherPage = () => {
             const cityIndex = Number(selectedCityIndex);
             const city = data[cityIndex];
             setSelectedCity(city);
+            setDisplayCity(city);
         }
     }, []);
 
